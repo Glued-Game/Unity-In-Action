@@ -14,23 +14,43 @@ public class MouseLook : MonoBehaviour {
 	private float maxVerticalY = 45f;
 	private float _rotationX = 0; // declared for vertical angle
 
+	void Start(){
+		Rigidbody playerBody = GetComponent <Rigidbody> ();
+		if(playerBody!=null){
+			playerBody.freezeRotation = true;
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 		if(axes == RotationAxes.MouseX){
 			// horizontal rotation here
 			transform.Rotate (0, Input.GetAxis("Mouse X")*speedXY, 0f);
-			print ("move Horizontally");
 		}
 		else if(axes == RotationAxes.MouseY){
+		/*
+		what this code does is simply 
+1) the new x-rotation is saved into the variable _rotationX
+2) you dont want the y-rotation to change! so what do you do? you save it into the variable rotationY
+     by calling  float rotationY = transform.localEulerAngles.y;
+		*/	
+			
 			// vertical rotation here
 			_rotationX -= Input.GetAxis ("Mouse Y") * speedXY;
 			_rotationX = Mathf.Clamp (_rotationX, minVerticalY, maxVerticalY);
 
-			float _rotationY = transform.localEulerAngles.y;
-			transform.localEulerAngles = new Vector3 (_rotationX, _rotationY, 0);
+			float rotationY = transform.localEulerAngles.y;
+			transform.localEulerAngles = new Vector3 (_rotationX, rotationY, 0);
 		}
 		else{
 			// both rhorizontal and vertical rotaion here
+			_rotationX -= Input.GetAxis ("Mouse Y") * speedXY;
+			_rotationX = Mathf.Clamp (_rotationX, minVerticalY, maxVerticalY);
+			// increment the rotation angle by delta
+			float delta = Input.GetAxis ("Mouse X") * speedXY;
+			float rotationY = transform.localEulerAngles.y + delta; // The rotation as Euler angles in degrees relative to the parent transform's rotation.
+
+			transform.localEulerAngles = new Vector3 (_rotationX, rotationY, 0);
 		}
 	}
 }
